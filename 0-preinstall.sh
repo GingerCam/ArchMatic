@@ -57,24 +57,23 @@ sgdisk -c 2:"ROOT" ${DISK}
 # make filesystems
 echo -e "\nCreating Filesystems...\n$HR"
 
-mkfs.vfat -F32 -n "UEFISYS" "${DISK}1"
-mkfs.btrfs -L "ROOT" "${DISK}2"
-mount -t btrfs "${DISK}2" /mnt
-btrfs subvolume create /mnt/@
+mkfs.vfat -F 32 -n "UEFISYS" "${DISK}1"
+mkfs.ext4 -L "ROOT" "${DISK}2"
+mount  "${DISK}2" /mnt
 umount /mnt
 ;;
 esac
 
 # mount target
-mount -t btrfs -o subvol=@ "${DISK}2" /mnt
+mount "${DISK}2" /mnt
 mkdir /mnt/boot
-mkdir /mnt/boot/efi
-mount -t vfat "${DISK}1" /mnt/boot/
+mkdir /mnt/boot/EFI
+mount  "${DISK}1" /mnt/boot/
 
 echo "--------------------------------------"
 echo "-- Arch Install on Main Drive       --"
 echo "--------------------------------------"
-pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget libnewt --noconfirm --needed
+pacstrap /mnt base base-devel linux linux-firmware vim nano sudo archlinux-keyring wget git dhcpcd net-tools libnewt --noconfirm --needed
 genfstab -U /mnt >> /mnt/etc/fstab
 echo "keyserver hkp://keyserver.ubuntu.com" >> /mnt/etc/pacman.d/gnupg/gpg.conf
 echo "--------------------------------------"
